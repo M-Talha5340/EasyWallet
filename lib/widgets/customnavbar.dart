@@ -1,102 +1,102 @@
 import 'package:flutter/material.dart';
 
-class CustomBottomNav extends StatelessWidget {
-  final int selectedIndex;
+class WalletBottomBar extends StatelessWidget {
+  final int selectedIndex ;
   final Function(int) onItemTapped;
-
-  const CustomBottomNav({
-    super.key,
-    required this.selectedIndex,
-    required this.onItemTapped,
-  });
+  const WalletBottomBar({super.key,required this.selectedIndex,required this.onItemTapped});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 90,
+      height: 100,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(28),
         ),
         boxShadow: [
           BoxShadow(
+            blurRadius: 20,
             color: Colors.black12,
-            blurRadius: 10,
             offset: Offset(0, -2),
-          ),
+          )
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-         
-        children: [
-           
-          _buildItem(
-            index: 0,
-            icon: Icons.task_alt_outlined,
-            label: "Tasks",
+        mainAxisAlignment: MainAxisAlignment.spaceAround,        
+        children:  [
+          bottomItem(
+            icon: Icons.account_balance_wallet_outlined,
+            title: "Wallet",
+            index: 0
           ),
-
-      
-          _buildItem(
+          bottomItem(
+            icon: Icons.history,
+            title: "History",
             index: 1,
-            icon: Icons.calendar_month_outlined,
-            label: "Calendar",
           ),
-
-          _buildItem(
+          bottomItem(
+            icon: Icons.payments_outlined,
+            title: "Payments",
             index: 2,
-            icon: Icons.person_outline,
-            label: "Profile",
+          ),
+          bottomItem(
+            icon: Icons.settings_outlined,
+            title: "Settings",
+            index: 3,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildItem({
-    required int index,
+Widget bottomItem({
     required IconData icon,
-    required String label,
-  }) {
-    bool selected = selectedIndex == index;
-
+    required String title,
+    required int index
+  }) {        
+        bool selected = selectedIndex == index;        
     return InkWell(
       onTap: () => onItemTapped(index),
-        child: AnimatedContainer(    
-          height: 70,
-          width: 80,      
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric( vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? const Color(0xff0D47A1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Center(
-          child: Column(
-            
-            children: [
-          
-              Icon(
-                icon,
-                size: 22,
-                color: selected ? Colors.white : Colors.grey[700],
-              ),
-          
-              const SizedBox(height: 5),
-          
-              Text(
-                label,
-                style: TextStyle(
-                  color: selected ? Colors.white : Colors.grey[700],
-                  fontSize: 16,
-                  fontWeight:
-                      selected ? FontWeight.bold : FontWeight.w500,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 5.0,bottom: 5.0),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 13,
+              vertical: 15,
+            ),
+            decoration: BoxDecoration(
+              color: selected
+                  ? const Color(0xffDFF8E8)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: selected
+                      ? const Color(0xff007A33)
+                      : Colors.grey.shade700,
+                  size: 28,
                 ),
-              ),
-            ],
+                const SizedBox(height: 6),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: selected
+                        ? const Color(0xff007A33)
+                        : Colors.grey.shade700,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

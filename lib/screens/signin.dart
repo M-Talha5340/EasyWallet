@@ -1,5 +1,5 @@
+import 'package:easy_wallet_app/screens/navbar.dart';
 import 'package:easy_wallet_app/screens/signup.dart';
-import 'package:easy_wallet_app/screens/wallet_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -258,7 +258,7 @@ class _EasyWalletLoginScreenState extends State<EasyWalletLoginScreen> {
                                     _autoValidate = true;
                                   });
                                 if(_formKey.currentState!.validate()){
-                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>WalletScreen()));
+                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>Navbar()));
                                 }
 
                               },
