@@ -1,8 +1,22 @@
+import 'package:easy_wallet_app/firebase_options.dart';
+import 'package:easy_wallet_app/providers/auth_provider.dart';
 import 'package:easy_wallet_app/screens/splash.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main()async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(
+     MultiProvider(
+      providers: [        
+        ChangeNotifierProvider(
+          create: (_) => Userprovider(),
+        ),
+      ],
+      child: const MyApp(),
+    ));
 }
 
 class MyApp extends StatelessWidget {

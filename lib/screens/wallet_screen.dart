@@ -1,8 +1,18 @@
+import 'package:easy_wallet_app/providers/auth_provider.dart';
+import 'package:easy_wallet_app/screens/navbar.dart';
 import 'package:easy_wallet_app/screens/rechargewallet.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
+  String maskPhoneNumber(String phone) {
+    if (phone.length <= 4) {
+      return phone;
+    }
+
+    return "${'*' * (phone.length - 4)}${phone.substring(phone.length - 4)}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +101,7 @@ class WalletScreen extends StatelessWidget {
 
                         const SizedBox(height: 10),
 
-                        const Row(
+                        Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
@@ -105,13 +115,19 @@ class WalletScreen extends StatelessWidget {
 
                             SizedBox(width: 12),
 
-                            Text(
-                              "5,420.00",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 50,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Selector<Userprovider, double?>(
+                              selector: (_, provider) =>
+                                  provider.user?.walletBalance,
+                              builder: (context, balance, child) {
+                                return Text(
+                                  (balance ?? "0.0").toString(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 50,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -138,14 +154,19 @@ class WalletScreen extends StatelessWidget {
 
                             const Spacer(),
 
-                            const Text(
-                              "**** 8824",
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 22,
-                                letterSpacing: 3,
-                                fontWeight: FontWeight.w600,
-                              ),
+                            Selector<Userprovider, String?>(
+                              selector: (p0, provider) => provider.user?.phone,
+                              builder: (context, phone, child) {
+                                return Text(
+                                  maskPhoneNumber(phone ?? "0000000"),
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 22,
+                                    letterSpacing: 3,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -165,7 +186,12 @@ class WalletScreen extends StatelessWidget {
 
                   child: ElevatedButton.icon(
                     onPressed: () {
-                       Navigator.push(context,MaterialPageRoute(builder: (_)=>RechargeWalletScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RechargeWalletScreen(),
+                        ),
+                      );
                     },
 
                     icon: const Icon(Icons.add, size: 34, color: Colors.white),
@@ -234,7 +260,12 @@ class WalletScreen extends StatelessWidget {
                     ),
 
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => Navbar(index: 1)),
+                        );
+                      },
 
                       child: const Text(
                         "View All",
@@ -289,111 +320,100 @@ class WalletScreen extends StatelessWidget {
       ),
     );
   }
+
   Widget transactionCard({
-  required IconData icon,
-  required Color iconBg,
-  required String title,
-  required String date,
-  required String amount,
-  required Color amountColor,
-}) {
-  return Container(
-    padding: const EdgeInsets.all(10),
+    required IconData icon,
+    required Color iconBg,
+    required String title,
+    required String date,
+    required String amount,
+    required Color amountColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
 
-    decoration: BoxDecoration(
-      color: Colors.white,
+      decoration: BoxDecoration(
+        color: Colors.white,
 
-      borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(25),
 
-      border: Border.all(
-        color: Colors.grey.shade300,
+        border: Border.all(color: Colors.grey.shade300),
       ),
-    ),
 
-    child: Row(
-      children: [
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 34,
+            backgroundColor: iconBg,
 
-        CircleAvatar(
-          radius: 34,
-          backgroundColor: iconBg,
-
-          child: Icon(
-            icon,
-            color: const Color(0xff007A33),
-            size: 34,
+            child: Icon(icon, color: const Color(0xff007A33), size: 34),
           ),
-        ),
 
-        const SizedBox(width: 18),
+          const SizedBox(width: 18),
 
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  date,
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
 
             children: [
-
               Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
+                amount,
+                style: TextStyle(
+                  fontSize: 24,
+                  color: amountColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
 
-              Text(
-                date,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+
+                decoration: BoxDecoration(
+                  color: const Color(0xffDDFBE7),
+                  borderRadius: BorderRadius.circular(25),
+                ),
+
+                child: const Text(
+                  "SUCCESS",
+                  style: TextStyle(
+                    color: Color(0xff007A33),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-
-          children: [
-
-            Text(
-              amount,
-              style: TextStyle(
-                fontSize: 24,
-                color: amountColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 6,
-              ),
-
-              decoration: BoxDecoration(
-                color: const Color(0xffDDFBE7),
-                borderRadius: BorderRadius.circular(25),
-              ),
-
-              child: const Text(
-                "SUCCESS",
-                style: TextStyle(
-                  color: Color(0xff007A33),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          ],
-        )
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget _actionCard({required IconData icon, required String title}) {
     return GestureDetector(

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:easy_wallet_app/screens/signin.dart';
+import 'package:easy_wallet_app/screens/authwrapper.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     void initState(){
       super.initState();
       Timer(const Duration(seconds: 3),(){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>EasyWalletLoginScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>AuthWrapper()));
       });
     }
 
@@ -148,44 +148,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 
                 ),
                 textAlign: TextAlign.center,
-              ),  
-              SizedBox(height: 30,), 
-               ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: LinearProgressIndicator(
-                  value: 1,
-                  minHeight: 5,
-                  backgroundColor: Colors.white10,
-                  valueColor: const AlwaysStoppedAnimation(
-                    Color(0xff61FF80),
-                  ),
-                ),
-              ),                        
-               SizedBox(height: 10,),
-              Row(
-                children: const [
-          
-                  Text(
-                    "Initializing secure session",
-                    style: TextStyle(
-                      color: Colors.white54,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-          
-                  Spacer(),
-          
-                  Text(
-                    "100%",
-                    style: TextStyle(
-                      color: Color(0xff61FF80),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
-              ),                    
+              ),                          
           
                             
             ],

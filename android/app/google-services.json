@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "117751649162",
+    "project_id": "easy-wallet-a4420",
+    "storage_bucket": "easy-wallet-a4420.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117751649162:android:df4c17a1df4ff9f9b2ee73",
+        "android_client_info": {
+          "package_name": "com.example.easy_wallet_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzrOuvG2nnZmX3hoW-zVwshL1fR4Yi7Cw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

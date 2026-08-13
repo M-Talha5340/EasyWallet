@@ -1,3 +1,6 @@
+import 'package:country_code_picker/country_code_picker.dart';
+import 'package:easy_wallet_app/screens/otpverification.dart';
+import 'package:easy_wallet_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class EasyWalletSignUpScreen extends StatefulWidget {
@@ -8,77 +11,32 @@ class EasyWalletSignUpScreen extends StatefulWidget {
 }
 
 class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
-  bool hidePassword = true;
-
+  String countryCode = "+92";
   final green = const Color(0xff007A33);
   final _formkey = GlobalKey<FormState>();
   var nameController = TextEditingController();
-  var emailController = TextEditingController();
-  var passwordController = TextEditingController();
-  bool _autoValidate= false;
+  var phoneController = TextEditingController();
+  bool _autoValidate = false;
+  bool isSendingOtp = false;
 
   @override
   void dispose() {
     nameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
-  String? validatePassword(String? val) {
-    if (val!.isEmpty) {
-      return "Enter Password";
-    } else {
-      bool hasUppercase = false;
-      bool hasLowercase = false;
-      bool hasDigit = false;
-      bool hasSpecialChar = false;
-      for (int i = 0; i < val.length; i++) {
-        String char = val[i];
-
-        if (char.contains(RegExp(r'[A-Z]'))) {
-          hasUppercase = true;
-        }
-        if (char.contains(RegExp(r'[a-z]'))) {
-          hasLowercase = true;
-        }
-        if (char.contains(RegExp(r'[0-9]'))) {
-          hasDigit = true;
-        }
-        if (char.contains(RegExp(r'[@$!%#^*?&]'))) {
-          hasSpecialChar = true;
-        }
-      }
-      if (val.length < 4) {
-        return "Must be atleast 4 characters";
-      }
-      if (!hasUppercase) {
-        return "Must contain at least one uppercase letter";
-      }
-
-      if (!hasLowercase) {
-        return "Must contain at least one lowercase letter";
-      }
-
-      if (!hasDigit) {
-        return "Must contain at least one number";
-      }
-
-      if (!hasSpecialChar) {
-        return "Must contain at least one special character";
-      }
-    }
-    return null;
-  }
-
-  RegExp phoneRegx = RegExp(r'^[0-9]{11}$');
+  RegExp phoneRegx = RegExp(r'^[3][0-9]{9}$');
 
   String? validatePhone(String? val) {
     if (val!.isEmpty) {
       return "Enter Phone No";
     }
+    if (!val.startsWith("3")) {
+      return "Enter a valid no";
+    }
     if (!val.contains(phoneRegx)) {
-      return "Must be 11 Digits";
+      return "Must be 10 Digits";
     }
 
     return null;
@@ -95,18 +53,55 @@ class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF6F8FA),
+      persistentFooterButtons: [
+        Center(
+          child: Column(
+            children: [
+              Container(
+                height: 58,
+                decoration: BoxDecoration(
+                  color: const Color(0xffEEF3FF),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.shield_outlined, color: green),
+                    const SizedBox(width: 10),
+                    const Text(
+                      "END-TO-END ENCRYPTED",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Text(
+                "Easy Wallet uses bank-grade security",
+                style: TextStyle(color: Colors.grey, fontSize: 17),
+              ),
+            ],
+          ),
+        ),
+      ],
+      persistentFooterDecoration: BoxDecoration(color: const Color(0xffF6F8FA)),
       body: SafeArea(
         child: Form(
           key: _formkey,
-          autovalidateMode:   _autoValidate
-               ? AutovalidateMode.onUserInteraction
-      : AutovalidateMode.disabled,
+          autovalidateMode: _autoValidate
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.disabled,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 26),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Column(
                 children: [
                   const SizedBox(height: 10),
@@ -144,7 +139,10 @@ class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
 
                   const SizedBox(height: 15),
                   Container(
-                    padding: const EdgeInsets.all(15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 30,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
@@ -165,6 +163,7 @@ class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
 
                         TextFormField(
                           validator: validateName,
+                            controller: nameController,
                           decoration: InputDecoration(
                             hintText: "e.g. Ahmed Khan",
                             hintStyle: const TextStyle(
@@ -186,62 +185,67 @@ class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
 
                         const SizedBox(height: 10),
 
-                        TextFormField(
-                          validator: validatePhone,
-                          decoration: InputDecoration(
-                            hintText: "e.g. 03005002001",
-                            hintStyle: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.grey,
-                            ),
-                            filled: true,
-                            fillColor: const Color(0xffEEF2F8),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(22),
-                              borderSide: BorderSide.none,
-                            ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF2F5FF),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 100,
+                                child: CountryCodePicker(
+                                  onChanged: (code) {
+                                    countryCode = code.dialCode!;
+                                  },
+                                  initialSelection: "PK",
+                                  favorite: const ["+92", "PK"],
+                                  showCountryOnly: false,
+                                  showOnlyCountryWhenClosed: false,
+                                  alignLeft: false,
+                                  showFlag: true,
+                                  flagWidth: 20,
+                                  textStyle: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+
+                              Container(
+                                height: 35,
+                                width: 1,
+                                color: Colors.grey.shade300,
+                              ),
+
+                              Expanded(
+                                child: TextFormField(
+                                  controller: phoneController,
+                                  validator: validatePhone,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                    hintText: "300 1234567",
+                                    hintStyle: TextStyle(color: Colors.grey),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
 
                         const SizedBox(height: 15),
-
-                        buildLabel("Password"),
-
-                        const SizedBox(height: 10),
-
-                        TextFormField(
-                          validator: validatePassword,
-                          obscureText: hidePassword,
-                          decoration: InputDecoration(
-                            hintText: "e.g. Abc@123",
-
-                            hintStyle: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.grey,
-                            ),
-
-                            filled: true,
-                            fillColor: const Color(0xffEEF2F8),
-
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                hidePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  hidePassword = !hidePassword;
-                                });
-                              },
-                            ),
-
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(22),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                        const Text(
+                          "By continuing ,you agree to recieve an SMS with verification code.",
+                          style: TextStyle(color: Colors.grey, fontSize: 17),
+                          textAlign: TextAlign.center,
                         ),
 
                         const SizedBox(height: 15),
@@ -249,7 +253,7 @@ class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
                         /// Sign Up Button
                         SizedBox(
                           width: double.infinity,
-                          height: 70,
+                          height: 60,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: green,
@@ -259,24 +263,76 @@ class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
                                 borderRadius: BorderRadius.circular(22),
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: isSendingOtp?null :()async {
                               setState(() {
-                              _autoValidate = true;
+                                _autoValidate = true;                                
                               });
-                              if (_formkey.currentState!.validate()) {}
+                              if (_formkey.currentState!.validate()) {
+                                 setState(() {
+                                    isSendingOtp = true;
+                                 });
+                                try {
+                                    await AuthService.instance.verifyPhone(
+                                      phoneNumber:
+                                          "$countryCode${phoneController.text}",
+
+                                      codeSent: (verificationId) {
+                                        setState(() {
+                                          isSendingOtp = false;
+                                        });
+                                        FocusManager.instance.primaryFocus!.unfocus();
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => OtpVerificationScreen(
+                                              phoneNumber:
+                                                  "$countryCode${phoneController.text}",
+                                              verificationId: verificationId,
+                                              isSignUp: true,
+                                              name: nameController.text,
+                                            ),
+                                          ),
+                                        );                                        
+                                      },
+
+                                      onError: (message) {
+                                        setState(() {
+                                          isSendingOtp = false;
+                                        });
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(content: Text(message)),
+                                        );
+                                      },
+                                    );
+                                  } catch (e) {
+                                    setState(() {
+                                          isSendingOtp = false;
+                                        });
+                                    if(!context.mounted){
+                                      return;
+                                    }
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(e.toString())),
+                                    );
+                                  }
+                              }
                             },
-                            child: const Row(
+                            child: isSendingOtp?Center(
+                              child: CircularProgressIndicator(color: Colors.white,),
+                            ) :const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Sign Up",
+                                  "Get Code",
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
                                 ),
-                                SizedBox(width: 15),
+                                SizedBox(width: 10),
                                 Icon(
                                   Icons.arrow_forward,
                                   color: Colors.white,
@@ -317,43 +373,6 @@ class _EasyWalletSignUpScreenState extends State<EasyWalletSignUpScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffEEF3FF),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.shield_outlined, color: green),
-                        const SizedBox(width: 10),
-                        const Text(
-                          "END-TO-END ENCRYPTED",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    "Easy Wallet uses bank-grade security",
-                    style: TextStyle(color: Colors.grey, fontSize: 17),
-                  ),
-
-                  const SizedBox(height: 30),
                 ],
               ),
             ),

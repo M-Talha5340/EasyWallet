@@ -7,8 +7,9 @@ import 'package:easy_wallet_app/widgets/customnavbar.dart';
 import 'package:flutter/material.dart';
 
 
-class Navbar extends StatefulWidget {  
-  const Navbar({super.key});
+class Navbar extends StatefulWidget { 
+    final int index ; 
+  const Navbar({super.key,required this.index});
 
   @override
   State<Navbar> createState() => _NavbarScreenState();
@@ -103,6 +104,7 @@ class _NavbarScreenState extends State<Navbar> {
    void initState(){
         super.initState();
         screens =[WalletScreen(),HistoryScreen(),PaymentScreen(),SettingScreen()];
+        selectedIndex = widget.index;
    }
    
   @override
