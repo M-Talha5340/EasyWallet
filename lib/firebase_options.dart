@@ -57,13 +57,12 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBzrOuvG2nnZmX3hoW-zVwshL1fR4Yi7Cw',
-    appId: '1:117751649162:android:df4c17a1df4ff9f9b2ee73',
+    apiKey: 'AIzaSyAXMMRbQkyNZ-YR3iBb8MjKIQASA3RJ_Zg',
+    appId: '1:117751649162:android:20a5c2cef5b47818b2ee73',
     messagingSenderId: '117751649162',
     projectId: 'easy-wallet-a4420',
     storageBucket: 'easy-wallet-a4420.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAoAtn4HHqhoPhfFfG3QJ4XHyPcUqp8V-o',
     appId: '1:117751649162:ios:1e0cf5d0622a06e6b2ee73',

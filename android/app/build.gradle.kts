@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.easy_wallet_app"
+    namespace = "com.biit.easy_wallet_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -19,9 +19,9 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.easy_wallet_app"
+        applicationId = "com.biit.easy_wallet_app"
         // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // Firebase Auth and Firestore require minSdkVersion >= 21
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

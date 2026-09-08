@@ -7,6 +7,28 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:117751649162:android:20a5c2cef5b47818b2ee73",
+        "android_client_info": {
+          "package_name": "com.biit.easy_wallet_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXMMRbQkyNZ-YR3iBb8MjKIQASA3RJ_Zg"
+        },
+        {
+          "current_key": "AIzaSyBzrOuvG2nnZmX3hoW-zVwshL1fR4Yi7Cw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:117751649162:android:df4c17a1df4ff9f9b2ee73",
         "android_client_info": {
           "package_name": "com.example.easy_wallet_app"
@@ -14,6 +36,9 @@
       },
       "oauth_client": [],
       "api_key": [
+        {
+          "current_key": "AIzaSyAXMMRbQkyNZ-YR3iBb8MjKIQASA3RJ_Zg"
+        },
         {
           "current_key": "AIzaSyBzrOuvG2nnZmX3hoW-zVwshL1fR4Yi7Cw"
         }
