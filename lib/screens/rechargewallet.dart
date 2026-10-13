@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:easy_wallet_app/screens/payfast_checkout.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class RechargeWalletScreen extends StatefulWidget {
   const RechargeWalletScreen({super.key});
@@ -8,7 +13,7 @@ class RechargeWalletScreen extends StatefulWidget {
 }
 
 class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
-  int selectedAmount = 1000;
+  double selectedAmount = 1000;
   int selectedMethod = 0;
 
   final TextEditingController amountController = TextEditingController(
@@ -19,6 +24,105 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
   void dispose() {
     amountController.dispose();
     super.dispose();
+  }
+Future<void> startCheckout(BuildContext context, String paymentId) async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      print("User is not logged in.");
+      return;
+    }
+
+    final idToken = await user.getIdToken();
+
+    const baseUrl = "http://192.168.0.104:5032";
+
+    final response = await http.post(
+      Uri.parse(
+        "$baseUrl/api/Payment/$paymentId/checkout",
+      ),
+      headers: {
+        "Authorization": "Bearer $idToken",
+        "Content-Type": "application/json",
+      },
+    );
+
+    print("STATUS: ${response.statusCode}");
+    print("RESPONSE: ${response.body}");
+
+    if (response.statusCode != 200) {
+      print("Checkout creation failed.");
+      return;
+    }
+
+    final data = jsonDecode(response.body);
+
+    final String actionUrl =
+        data["checkout"]["actionUrl"];
+
+    final Map<String, String> fields =
+        Map<String, String>.from(
+      data["checkout"]["fields"],
+    );
+
+    if (!context.mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PayFastCheckoutScreen(
+          actionUrl: actionUrl,
+          fields: fields,
+        ),
+      ),
+    );
+  } catch (e) {
+    print("CHECKOUT ERROR: $e");
+  }
+}
+  Future<void> createPayment() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        print("No user is currently logged in.");
+        return;
+      }
+
+      // Get Firebase ID Token
+      final idToken = await user.getIdToken();
+
+      print("Firebase UID: ${user.uid}");
+      print("ID TOKEN RECEIVED");
+
+      // Replace this with your PC's IPv4 address
+      const baseUrl = "http://192.168.0.104:5032";
+
+      final response = await http.post(
+        Uri.parse("$baseUrl/api/Payment/create"),
+        body: jsonEncode({
+          "Amount": selectedAmount.toString(),
+          "Content-Type": "application/json",
+        }),
+        headers: {
+          "Authorization": "Bearer $idToken",
+          "Content-Type": "application/json",
+        },
+      );
+
+      print("STATUS CODE: ${response.statusCode}");
+      print("RESPONSE: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        print("Backend verified : ${data['message']}");
+        print("Backend verified Balance Status: ${data['status']}");
+      }
+    } catch (e) {
+      print("ERROR: $e");
+    }
   }
 
   @override
@@ -192,15 +296,21 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
                   width: double.infinity,
                   height: 65,
                   child: ElevatedButton(
-                    onPressed: () {
-                      int amount;
+                    onPressed: () async {
+                      double amount;
 
                       if (amountController.text.isEmpty) {
                         amount = selectedAmount;
                       } else {
-                        amount = int.parse(amountController.text);
+                        amount = double.parse(amountController.text);
                       }
-
+                      await startCheckout(
+                        context,
+                        "a309f3b4-0adb-43bc-8cbf-aaac0c797fc6",
+                      );
+                      if (!context.mounted) {
+                        return;
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -358,7 +468,7 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
     );
   }
 
-  Widget _amountButton(int amount) {
+  Widget _amountButton(double amount) {
     final bool selected = selectedAmount == amount;
 
     return GestureDetector(

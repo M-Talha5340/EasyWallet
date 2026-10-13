@@ -7,28 +7,62 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> verifyPhone({
-    required String phoneNumber,
-    required Function(String verificationId) codeSent,
-    required Function(String message) onError,
-  }) async {
+  required String phoneNumber,
+  required Function(String verificationId) codeSent,
+  required Function(String message) onError,
+}) async {
+  try {
+    print("PHONE NUMBER: $phoneNumber");
+    print("STARTING PHONE VERIFICATION...");
+
+    // Force Firebase Phone Auth to use reCAPTCHA
+    await _auth.setSettings(
+      forceRecaptchaFlow: true,
+    );
+
+    print("RECAPTCHA FLOW ENABLED");
+
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
 
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
+        print("VERIFICATION COMPLETED AUTOMATICALLY");
+
+        try {
+          await _auth.signInWithCredential(credential);
+          print("AUTOMATIC SIGN IN SUCCESSFUL");
+        } catch (e) {
+          print("AUTOMATIC SIGN IN ERROR: $e");
+        }
       },
 
       verificationFailed: (FirebaseAuthException e) {
+        print("========== PHONE AUTH ERROR ==========");
+        print("CODE: ${e.code}");
+        print("MESSAGE: ${e.message}");
+        print("DETAILS: ${e.toString()}");
+        print("======================================");
+
         onError(e.message ?? "Verification Failed");
       },
 
       codeSent: (String verificationId, int? resendToken) {
+        print("OTP SENT SUCCESSFULLY");
+        print("VERIFICATION ID: $verificationId");
+
         codeSent(verificationId);
       },
 
-      codeAutoRetrievalTimeout: (String verificationId) {},
+      codeAutoRetrievalTimeout: (String verificationId) {
+        print("OTP AUTO RETRIEVAL TIMEOUT");
+        print("VERIFICATION ID: $verificationId");
+      },
     );
+  } catch (e) {
+    print("VERIFY PHONE EXCEPTION: $e");
+    onError(e.toString());
   }
+}
 
   Future<bool> verifypassword({
     required String verificationId,

@@ -1,11 +1,58 @@
+import 'dart:convert';
+
 import 'package:easy_wallet_app/providers/auth_provider.dart';
 import 'package:easy_wallet_app/screens/navbar.dart';
 import 'package:easy_wallet_app/screens/rechargewallet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
+
+
+
+Future<void> testBackendAuthentication() async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      print("No user is currently logged in.");
+      return;
+    }
+
+    // Get Firebase ID Token
+    final idToken = await user.getIdToken();
+
+    print("Firebase UID: ${user.uid}");
+    print("ID TOKEN RECEIVED");
+
+    // Replace this with your PC's IPv4 address
+    const baseUrl = "http://192.168.0.103:5032";
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/api/Wallet/balance"),
+      headers: {
+        "Authorization": "Bearer $idToken",
+        "Content-Type": "application/json",
+      },
+    );
+
+    print("STATUS CODE: ${response.statusCode}");
+    print("RESPONSE: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      print("Backend verified UID: ${data['uid']}");
+      print("Backend verified Balance**: ${data['walletBalance']}");
+    }
+  } catch (e) {
+    print("ERROR: $e");
+  }
+}
+
   String maskPhoneNumber(String phone) {
     if (phone.length <= 4) {
       return phone;
@@ -261,10 +308,12 @@ class WalletScreen extends StatelessWidget {
 
                     TextButton(
                       onPressed: () {
+                        testBackendAuthentication();
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => Navbar(index: 1)),
                         );
+                        
                       },
 
                       child: const Text(
