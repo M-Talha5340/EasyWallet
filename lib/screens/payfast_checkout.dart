@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -13,12 +12,10 @@ class PayFastCheckoutScreen extends StatefulWidget {
   });
 
   @override
-  State<PayFastCheckoutScreen> createState() =>
-      _PayFastCheckoutScreenState();
+  State<PayFastCheckoutScreen> createState() => _PayFastCheckoutScreenState();
 }
 
-class _PayFastCheckoutScreenState
-    extends State<PayFastCheckoutScreen> {
+class _PayFastCheckoutScreenState extends State<PayFastCheckoutScreen> {
   late final WebViewController _controller;
 
   @override
@@ -34,22 +31,21 @@ class _PayFastCheckoutScreenState
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {
-            debugPrint('WebView page started: $url');
+            debugPrint('PAGE STARTED: $url');
           },
           onPageFinished: (url) {
-            debugPrint('WebView page finished: $url');
+            debugPrint('PAGE FINISHED: $url');
           },
           onNavigationRequest: (request) {
-            debugPrint(
-              'WebView navigation requested: ${request.url}',
-            );
+            debugPrint('NAVIGATION: ${request.url}');
             return NavigationDecision.navigate;
           },
           onWebResourceError: (error) {
-            debugPrint(
-              'WebView error: ${error.errorCode} '
-              '${error.description}; URL: ${error.url}',
-            );
+            debugPrint('WEB RESOURCE ERROR');
+            debugPrint('Code: ${error.errorCode}');
+            debugPrint('Description: ${error.description}');
+            debugPrint('URL: ${error.url}');
+            debugPrint('Main frame: ${error.isForMainFrame}');
           },
         ),
       )
@@ -57,13 +53,15 @@ class _PayFastCheckoutScreenState
   }
 
   String _buildPaymentForm() {
-    final fieldsHtml = widget.fields.entries.map((entry) {
-      final name = _escapeHtml(entry.key);
-      final value = _escapeHtml(entry.value);
+    final fieldsHtml = widget.fields.entries
+        .map((entry) {
+          final name = _escapeHtml(entry.key);
+          final value = _escapeHtml(entry.value);
 
-      return '<input type="hidden" '
-          'name="$name" value="$value">';
-    }).join('\n');
+          return '<input type="hidden" '
+              'name="$name" value="$value">';
+        })
+        .join('\n');
 
     final action = _escapeHtml(widget.actionUrl);
 
@@ -102,9 +100,7 @@ class _PayFastCheckoutScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('PayFast Payment'),
-      ),
+      appBar: AppBar(title: const Text('PayFast Payment')),
       body: WebViewWidget(controller: _controller),
     );
   }

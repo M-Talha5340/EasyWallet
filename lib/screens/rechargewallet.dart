@@ -36,7 +36,7 @@ Future<void> startCheckout(BuildContext context, String paymentId) async {
 
     final idToken = await user.getIdToken();
 
-    const baseUrl = "http://192.168.0.104:5032";
+    const baseUrl = "http://192.168.0.103:5032";
 
     final response = await http.post(
       Uri.parse(
@@ -97,7 +97,7 @@ Future<void> startCheckout(BuildContext context, String paymentId) async {
       print("ID TOKEN RECEIVED");
 
       // Replace this with your PC's IPv4 address
-      const baseUrl = "http://192.168.0.104:5032";
+      const baseUrl = "http://192.168.0.103:5032";
 
       final response = await http.post(
         Uri.parse("$baseUrl/api/Payment/create"),
